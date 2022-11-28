@@ -1,5 +1,3 @@
--- Hello! Here is our SQL code. 
-
 DROP DATABASE IF EXISTS `CPStalk`;
 CREATE DATABASE `CPStalk`;
 USE `CPStalk`;
