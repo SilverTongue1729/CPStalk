@@ -1,3 +1,5 @@
+-- Hello! Here is our SQL code. 
+
 DROP DATABASE IF EXISTS `CPStalk`;
 CREATE DATABASE `CPStalk`;
 USE `CPStalk`;
@@ -30,13 +32,13 @@ CREATE TABLE PLATFORM (
 DROP TABLE IF EXISTS `TEAMS`;
 CREATE TABLE TEAMS (
   Team_Id INT NOT NULL,
-  Team_Name VARCHAR(30),
+  Team_Name VARCHAR(50),
   Date_of_Creation DATE,
   Team_Size INT,
   PRIMARY KEY (Team_Id)
 );
------------------------------
-----WEAK ENTITIES
+--
+-- WEAK ENTITIES
 DROP TABLE IF EXISTS `PROBLEM`;
 CREATE TABLE PROBLEM (
   Problem_Id INT NOT NULL,
@@ -45,7 +47,6 @@ CREATE TABLE PROBLEM (
   Total_Attempts INT,
   Problem_Rating INT,
   PRIMARY KEY (Problem_Id, PlatN),
-  UNIQUE (Problem_Id),
   FOREIGN KEY (PlatN) REFERENCES PLATFORM(Platform_Name)
 );
 DROP TABLE IF EXISTS `CONTEST`;
@@ -57,18 +58,16 @@ CREATE TABLE CONTEST (
   Number_of_Participants INT,
   Style VARCHAR(20),
   PRIMARY KEY (Contest_Id, PlatN),
-  UNIQUE (Contest_Id),
   FOREIGN KEY (PlatN) REFERENCES PLATFORM(Platform_Name)
 );
----------------------------------------
----------------------------------------
----MULTIVALUED
+-- --------
+-- --------
+-- MULTIVALUED
 DROP TABLE IF EXISTS `PROBLEM_AUTHOR`;
 CREATE TABLE PROBLEM_AUTHOR(
   ProbKey INT NOT NULL,
   PlatName VARCHAR(20) NOT NULL,
   Prob_Author VARCHAR(15) NOT NULL,
-  UNIQUE (ProbKey),
   PRIMARY KEY (ProbKey, Prob_Author),
   FOREIGN KEY (ProbKey) REFERENCES PROBLEM(Problem_Id),
   FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name)
@@ -77,37 +76,37 @@ DROP TABLE IF EXISTS `PROBLEM_TAGS`;
 CREATE TABLE PROBLEM_TAGS(
   ProbId INT NOT NULL,
   PlatName VARCHAR(20) NOT NULL,
-  Prob_Tags VARCHAR(15) NOT NULL,
+  Prob_Tags VARCHAR(50) NOT NULL,
   PRIMARY KEY (ProbId, Prob_Tags, PlatName),
   FOREIGN KEY (ProbID) REFERENCES PROBLEM(Problem_Id),
-  FOREIGN KEY (PlatName) REFERENCES PLATFORM(Problem_Id)
+  FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name)
 );
 DROP TABLE IF EXISTS `PLATFORM_LANGUAGES`;
-CREATE TABLE PLATFORM_LANGUAGES(
+CREATE TABLE PLATFORM_LANGUAGES (
   PlatName VARCHAR(20) NOT NULL,
   Plat_Languages VARCHAR(15) NOT NULL,
   PRIMARY KEY (PlatName, Plat_Languages),
-  FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name),
+  FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name)
 );
-------------------------------
+-- 
 DROP TABLE IF EXISTS `TEAM_REGISTER_ON`;
 CREATE TABLE TEAM_REGISTER_ON (
-  Pname VARCHAR(20) NOT NULL,
+  Pname VARCHAR(50) NOT NULL,
   TeamKey INT NOT NULL,
-  TeamName VARCHAR(15),
+  TeamName VARCHAR(50),
   Team_Rating INT,
   Rank_ INT,
   PRIMARY KEY (Pname, TeamKey),
   FOREIGN KEY (Pname) REFERENCES PLATFORM(Platform_Name),
-  FOREIGN KEY (TeamKey) REFERENCES TEAMS(Team_Id)
+  FOREIGN KEY (TeamKey) REFERENCES TEAMS(Team_Id) ON DELETE CASCADE
 );
 DROP TABLE IF EXISTS `TEAM_USERS`;
 CREATE TABLE TEAM_USERS (
   TeamKey INT NOT NULL,
   UName VARCHAR(20),
   PRIMARY KEY (TeamKey, UName),
-  FOREIGN KEY (TeamKey) REFERENCES TEAMS(Team_Id)
-  FOREIGN KEY (UName) REFERENCES USER(UserName)
+  FOREIGN KEY (TeamKey) REFERENCES TEAMS(Team_Id) ON DELETE CASCADE,
+  FOREIGN KEY (UName) REFERENCES USERS(UserName) ON DELETE CASCADE
 );
 DROP TABLE IF EXISTS `PRAC1`;
 CREATE TABLE PRAC1 (
@@ -129,7 +128,7 @@ CREATE TABLE PRAC2 (
   PlatName VARCHAR(20) NOT NULL,
   Submission_Id INT NOT NULL,
   PRIMARY KEY (Uname, PlatName, Submission_Id),
-  FOREIGN KEY (Uname) REFERENCES USERS(Username),
+  FOREIGN KEY (Uname) REFERENCES USERS(Username) ON DELETE CASCADE,
   FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name)
 );
 DROP TABLE IF EXISTS `PRAC3`;
@@ -151,17 +150,17 @@ CREATE TABLE USER_REGISTER_ON (
   Rank_ INT,
   PRIMARY KEY (Pname, Uname),
   FOREIGN KEY (Pname) REFERENCES PLATFORM(Platform_Name),
-  FOREIGN KEY (Uname) REFERENCES USERS(Username)
+  FOREIGN KEY (Uname) REFERENCES USERS(Username) ON DELETE CASCADE
 );
 DROP TABLE IF EXISTS `FRIENDS`;
 CREATE TABLE FRIENDS (
   Friend1_name VARCHAR(20) NOT NULL,
   Friend2_name VARCHAR(20) NOT NULL,
   PRIMARY KEY (Friend1_name, Friend2_name),
-  FOREIGN KEY (Friend1_name) REFERENCES USERS(Username),
-  FOREIGN KEY (Friend2_name) REFERENCES USERS(Username)
+  FOREIGN KEY (Friend1_name) REFERENCES USERS(Username) ON DELETE CASCADE,
+  FOREIGN KEY (Friend2_name) REFERENCES USERS(Username) ON DELETE CASCADE
 );
-------------------------------------
+-- ----------------------------------
 DROP TABLE IF EXISTS `ATTEMPTS_1`;
 CREATE TABLE ATTEMPTS_1 (
   PlatName VARCHAR(20) NOT NULL,
@@ -176,7 +175,7 @@ CREATE TABLE ATTEMPTS_1 (
   PRIMARY KEY (PlatName, SubmissionId),
   FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name),
   FOREIGN KEY (ContestId) REFERENCES CONTEST(Contest_Id),
-  FOREIGN KEY (ProbId) REFERENCES PROBLEM(Problem_Id),
+  FOREIGN KEY (ProbId) REFERENCES PROBLEM(Problem_Id)
 );
 DROP TABLE IF EXISTS `ATTEMPTS_2`;
 CREATE TABLE ATTEMPTS_2 (
@@ -187,7 +186,7 @@ CREATE TABLE ATTEMPTS_2 (
   Memory_Limit INT,
   PRIMARY KEY (PlatName, ProbId),
   FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name),
-  FOREIGN KEY (ProbId) REFERENCES PROBLEM(Problem_Id),
+  FOREIGN KEY (ProbId) REFERENCES PROBLEM(Problem_Id)
 );
 DROP TABLE IF EXISTS `ATTEMPTS_3`;
 CREATE TABLE ATTEMPTS_3 (
@@ -195,10 +194,11 @@ CREATE TABLE ATTEMPTS_3 (
   TeamId INT NOT NULL,
   PlatName VARCHAR(20) NOT NULL,
   SubmissionId INT NOT NULL,
-  PRIMARY KEY (Uname, TeamId, PlatName, SubmissionId),
-  FOREIGN KEY (Uname) REFERENCES USERS(Username),
+  -- PRIMARY KEY (Uname, TeamId, PlatName, SubmissionId),
+  PRIMARY KEY (PlatName, SubmissionId),
+  FOREIGN KEY (Uname) REFERENCES USERS(Username) ON DELETE CASCADE,
   FOREIGN KEY (PlatName) REFERENCES PLATFORM(Platform_Name),
-  FOREIGN KEY (TeamId) REFERENCES TEAMS(Team_Id),
+  FOREIGN KEY (TeamId) REFERENCES TEAMS(Team_Id) ON DELETE CASCADE
 );
 -- Inserting values into the tables
 
@@ -296,7 +296,7 @@ VALUES (
     'Codechef',
     '544635',
     '239970',
-    '2009-09',
+    '2009-09-02',
     '	Bangalore, India',
     'Bhavin Turakhia'
   ),
@@ -304,7 +304,7 @@ VALUES (
     'SPOJ',
     '1007749',
     NULL,
-    '2004',
+    '2004-09-09',
     'Gdynia, Pomorskie, Poland',
     'Sphere Research Labs'
   ),
@@ -320,7 +320,7 @@ VALUES (
     'TopCoder',
     '1740525',
     NULL,
-    '2001-04',
+    '2001-04-01',
     'Indianapolis, USA',
     'Jack Hughes'
   );
@@ -475,7 +475,7 @@ VALUES (
     2,
     2,
     'MLE',
-    '2021-3-12 11:23:63',
+    '2021-3-12 11:23:53',
     'Haskell',
     30,
     256000
@@ -522,7 +522,7 @@ VALUES ('Codeforces', 1, 2000, 256000),
   ('Codechef', 1, 2000, 256000),
   ('Codeforces', 2, 1000, 256000),
   ('Atcoder', 1, 1000, 512000),
-  ('Codeforces', 1, 3000, 256000),
+  ('Codeforces', 3, 3000, 256000),
   ('TopCoder', 1, 1000, 512000);
 INSERT INTO FRIENDS
 VALUES ('tourist', 'jiangly'),
@@ -536,23 +536,23 @@ VALUES ('tourist', 'jiangly'),
   ('codelegend', 'tourist'),
   ('codelegend', 'jiangly');
 INSERT INTO USER_REGISTER_ON -- Platform name, Teamkey, Platform User Name, Rating, Rank
-VALUES ('Codeforces', 'tourist', '3817', 1),
-  ('Codechef', 'tourist', '4092', 1),
-  ('AtCoder', 'tourist', '3976', 1),
-  ('Codeforces', 'jiangly', '3591', 2),
-  ('Codechef', 'jiangly', '2143',5),
-  ('Codeforces', 'Baba', '2435', 6),
-  ('Codechef', 'tanuj_khattar', '2314',4),
-  ('Codeforces', 'akcube', '1725', 8),
-  ('Codechef', 'akcube', '2123', 7),
-  ('Codeforces', 'BenQ', '3584', 3),
-  ('AtCoder', 'BenQ', '3658', 2),
-  ('Codeforces', 'SecondThread', '2488', 5),
-  ('Codechef', 'SecondThread', '2127',6),
-  ('Codeforces', 'codelegend', '2380', 7),
-  ('Codechef', 'codelegend', '2317',3),
-  ('Codeforces', 'kal013', '2753', 4),
-  ('Codechef', 'kal013', '2737', 2);
+VALUES ('Codeforces', 'tourist','tourist', '3817', 1),
+  ('Codechef', 'tourist','tourist', '4092', 1),
+  ('AtCoder', 'tourist','tourist', '3976', 1),
+  ('Codeforces', 'jiangly','jiangly', '3591', 2),
+  ('Codechef', 'jiangly','jiangly', '2143',5),
+  ('Codeforces', 'baba','Baba', '2435', 6),
+  ('Codechef', 'baba','tanuj_khattar', '2314',4),
+  ('Codeforces', 'akcube','akcube', '1725', 8),
+  ('Codechef', 'akcube','akcube', '2123', 7),
+  ('Codeforces', 'BenQ','BenQ', '3584', 3),
+  ('AtCoder', 'BenQ','BenQ', '3658', 2),
+  ('Codeforces', 'SecondThread','SecondThread', '2488', 5),
+  ('Codechef', 'SecondThread','SecondThread', '2127',6),
+  ('Codeforces', 'codelegend','codelegend', '2380', 7),
+  ('Codechef', 'codelegend','codelegend', '2317',3),
+  ('Codeforces', 'kal013','kal013', '2753', 4),
+  ('Codechef', 'kal013','kal013', '2737', 2);
 INSERT INTO PROBLEM_AUTHOR
 VALUES (1, 'Codeforces', 'amurto'),
   (1, 'Codeforces', 'satyam_343'),
@@ -631,8 +631,8 @@ VALUES (
   );
 INSERT INTO ATTEMPTS_2 -- PlatformName, ProblemID, ContestID, Time Limit, Memory Limit
 VALUES ('Codeforces', 1, 1, 56, 1700),
-  ('Codeforces', 1, 1, 44, 2200),
-  ('Codeforces', 1, 1, 526, 1400),
+  ('Codechef', 1, 1, 44, 2200),
+  ('Codeforces', 2, 1, 526, 1400),
   ('AtCoder', 1, 1, 129, 1100);
 INSERT INTO ATTEMPTS_3 -- UserName, TeamID, PlatformName, SubmissionID
 VALUES ('tourist', 1, 'Codeforces', 4),

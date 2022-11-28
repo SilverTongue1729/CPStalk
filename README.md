@@ -38,6 +38,7 @@ Data and Applications Monsoon 2022 Project
   - `attmepts_3` should only have `platform_name` and `submission_id` as primary key, then `teamID` could be null
 - Also just add another table for `team_user`
 
+- added ranks to `user_register_on`
 - add, delete platform `language`??
   
 ## Constraints
@@ -46,12 +47,11 @@ Data and Applications Monsoon 2022 Project
 
 ## Modifications
 
-- added ranks to `user_register_on`
+- changed primary key to just `platform_name` and `submission_ID`, in `attempts_3` and `prac_3`
 
-- need to create `team_users`, with attributes team_ID, username, platform:
-  - tourist, jiangly, "Travelling Salesman"
-  - Baba, codelegend, akcube "ladaiLadai"
-  - BenQ, SecondThread "The_P_is_Hard"
+- created `team_users`, with attributes team_ID, username, platform:
 
-- add contest_id to problem
+- added `platform_name` to `problem_tags` and `problem_authors` as attributes and primary key
+
+- add contest_id to problem? can be null;
   
